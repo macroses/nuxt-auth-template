@@ -3,7 +3,5 @@
 </script>
 
 <template>
-  <div>
-    <AuthForm />
-  </div>
+  <AuthForm />
 </template>

@@ -10,21 +10,12 @@ interface InputProps {
 }
 
 const props = defineProps<InputProps>()
-const emit = defineEmits('update:modelValue')
-//
-// const value = computed({
-//   get () {
-//     return props.modelValue
-//   },
-//   set (value) {
-//     emit('update:modelValue', value)
-//   }
-// })
 
-const value = defineModel({
-  prop: 'modelValue',
-  event: 'update:modelValue'
-})
+defineEmits<{
+  (e: 'update:modelValue', value: EventTarget): void
+}>()
+
+const value = defineModel<string | number>()
 </script>
 
 <template>
@@ -37,7 +28,6 @@ const value = defineModel({
       :name="props.name"
       :disabled="props.disabled"
       v-model="value"
-      @input="(e) => emit('update:modelValue', e.target.value)"
     />
   </label>
 </template>

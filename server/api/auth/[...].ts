@@ -12,24 +12,29 @@ export default NuxtAuthHandler({
   adapter: PrismaAdapter(prisma),
   secret: 'your-secret-here',
   providers: [
-    // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
+    // @ts-ignore
     GithubProvider.default({
       clientId: useRuntimeConfig().githubId,
       clientSecret: useRuntimeConfig().githubSecret
     }),
+    // @ts-ignore
     GoogleProvider.default({
       clientId: useRuntimeConfig().googleId,
       clientSecret: useRuntimeConfig().googleSecret
     }),
+    // @ts-ignore
     CredentialsProvider.default({
-      name: 'credentials',
+      name: 'Credentials',
       credentials: {
         email: { label: 'email', type: 'email'},
         password: { type: 'password', label: 'password' }
       },
-      async authorize (credentials: any) {
+      async authorize (credentials: any): Promise<any> {
         if (!credentials?.email || !credentials?.password) {
-          throw createError(500, 'Missing required fields')
+          throw createError({
+            statusCode: 500,
+            statusMessage: 'Missing Info'
+          })
         }
 
         const user = await prisma.user.findUnique({
@@ -39,13 +44,19 @@ export default NuxtAuthHandler({
         })
 
         if (!user || !user.hashedPassword) {
-          throw createError(501, 'Invalid credentials')
+          throw createError({
+            statusCode: 401,
+            statusMessage: 'Invalid Credentials'
+          })
         }
 
         const correctPassword = await bcrypt.compare(credentials.password, user.hashedPassword)
 
         if (!correctPassword) {
-          throw createError(501, 'Invalid credentials')
+          throw createError({
+            statusCode: 401,
+            statusMessage: 'Invalid Credentials'
+          })
         }
 
         return user

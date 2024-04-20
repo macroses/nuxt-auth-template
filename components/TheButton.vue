@@ -10,7 +10,7 @@ defineProps<ButtonProps>()
 
 <template>
   <button
-    :type="{ type }"
+    :type="type"
     :class="{ 'button--full-width': fullWidth }"
     :disabled="disabled"
   >

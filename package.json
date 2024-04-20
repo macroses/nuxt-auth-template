@@ -10,7 +10,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -24,7 +25,13 @@
   },
   "devDependencies": {
     "@prisma/client": "^5.12.1",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/test-utils": "^2.4.5",
     "bcrypt": "5.1.0",
-    "prisma": "^5.12.1"
+    "happy-dom": "^14.7.1",
+    "prisma": "^5.12.1",
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0",
+    "vue-tsc": "^1"
   }
 }

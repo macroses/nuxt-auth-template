@@ -1,9 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: [
-    '@sidebase/nuxt-auth',
-  ],
+  modules: ['@sidebase/nuxt-auth'],
   runtimeConfig: {
     authSecret: '',
     githubId: '',
@@ -14,5 +12,8 @@ export default defineNuxtConfig({
     public: {
 
     }
+  },
+  typescript: {
+    typeCheck: true
   }
 })

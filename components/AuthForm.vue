@@ -1,44 +1,46 @@
 <script setup lang="ts">
-
-enum VARIANT {
-  LOGIN = 'LOGIN',
-  REGISTER = 'REGISTER',
-}
+type VARIANT = 'LOGIN' | 'REGISTER'
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
+const error = ref<string | null>(null)
 
 const { signIn } = useAuth()
 
 const variant = ref<VARIANT>('LOGIN')
 
-const authButtonText = computed(() => variant.value === VARIANT.LOGIN ? 'Login' : 'Register')
+const authButtonText = computed(() => variant.value === 'LOGIN' ? 'Login' : 'Register')
 
 const toggleVariant = () => {
-  variant.value = variant.value === VARIANT.LOGIN ? VARIANT.REGISTER : VARIANT.LOGIN
+  variant.value = variant.value === 'LOGIN' ? 'REGISTER' : 'LOGIN'
 }
 
 async function onSubmit() {
-  if(variant.value === VARIANT.REGISTER) {
+  if(variant.value === 'REGISTER') {
     try {
       isLoading.value = true
 
-      const { data, error } = await $fetch('/api/auth/register', {
+      const { user } = await $fetch('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify({
           name: name.value,
           email: email.value,
           password: password.value
-        })
+        }),
       })
 
-      if (error) console.log(error)
-      if (data) console.log('successfully register')
+      if (!user) {
+        console.log('failed to register')
+        return
+      }
+      if (user) {
+        console.log('successfully register')
+      }
 
       isLoading.value = false
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message)
     } finally {
       isLoading.value = false
@@ -50,21 +52,22 @@ async function onSubmit() {
       const result = await signIn('credentials', {
         email: email.value,
         password: password.value,
-        redirect: '/about'
-      })
+        redirect: false
+      }) as any
+
+      console.log(result)
 
       if (result?.ok && !result.error) {
         console.log('successfully login')
+        await navigateTo('/home')
       } else {
-        console.log('failed to login')
+        error.value = result.error
+        return
       }
 
-      if (error) console.log(error.value)
-      if (data) console.log('successfully register')
-
       isLoading.value = false
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      console.error(error.message)
     } finally {
       isLoading.value = false
     }
@@ -74,13 +77,14 @@ async function onSubmit() {
 const socialAuth = async (action: string) => {
   isLoading.value = true;
 
-  await signIn(action, { redirect: false });
+  await signIn(action);
+  navigateTo('/home')
 }
 </script>
 
 <template>
   <form @submit.prevent="onSubmit">
-    {{ name}}
+    {{ error }}
     <TheInput
       v-if="variant === 'REGISTER'"
       id="name"
@@ -108,7 +112,7 @@ const socialAuth = async (action: string) => {
       v-model="password"
     />
 
-    <TheButton type="submit">
+    <TheButton button-type="submit">
       {{ authButtonText }}
     </TheButton>
     <p>or continue with</p>
@@ -121,10 +125,10 @@ const socialAuth = async (action: string) => {
 
     <div class="form-helper">
       <p @click="toggleVariant">
-        {{ variant === VARIANT.REGISTER ? 'Don’t have an account?' : 'Already have an account?' }}
+        {{ variant === 'REGISTER' ? 'Don’t have an account?' : 'Already have an account?' }}
       </p>
       <p class="link" @click="toggleVariant">
-        {{ variant === VARIANT.LOGIN ? 'create an account' : 'login' }}
+        {{ variant === 'LOGIN' ? 'create an account' : 'login' }}
       </p>
     </div>
   </form>

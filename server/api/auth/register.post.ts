@@ -10,7 +10,10 @@ export default defineEventHandler(async (event: H3Event) => {
     console.log(name, email, password)
 
     if (!name || !email || !password) {
-      throw createError(500, 'Missing required fields')
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Missing required fields'
+      })
     }
 
     const hashedPassword = await bcrypt.hash(password, 12)
@@ -25,6 +28,9 @@ export default defineEventHandler(async (event: H3Event) => {
 
     return { user }
   } catch (error) {
-    throw createError(500, 'Something went wrong.')
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Something went wrong. Please try again later.'
+    })
   }
 })
